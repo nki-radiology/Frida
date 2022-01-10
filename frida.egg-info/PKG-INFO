@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: frida
+Version: 0.0.1
+Summary: A package for creating modular data pipeline to process medical images
+Home-page: UNKNOWN
+Author: Stefano Trebeschi
+Author-email: <s.trebeschi@nki.nl>
+License: UNKNOWN
+Keywords: python,medical imaging,radiology,pipeline
+Platform: UNKNOWN
+Classifier: Development Status :: 1 - Planning
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Description-Content-Type: text/markdown
+
+A package for creating modular data pipeline to process medical images
+

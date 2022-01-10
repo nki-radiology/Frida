@@ -1,5 +1,6 @@
 from .base import Pipeline
 
+
 class FirstToSucceed(Pipeline):
     '''
     Selects the first transform/reader to succeed. 

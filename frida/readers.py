@@ -1,12 +1,13 @@
 from .base import Read
-
 import SimpleITK as sitk
+
 
 # !- Readers for common medical imaging formats
 
+
 class ReadVolume(Read):
 
-    def __call__( self, filename ):
+    def __call__(self, filename):
 
         try:
             image = sitk.ReadImage(filename)
@@ -17,7 +18,7 @@ class ReadVolume(Read):
 
 class ReadDICOM(Read):
 
-    def __call__( self, filename ):
+    def __call__(self, filename):
 
         try:
             reader = sitk.ImageSeriesReader()
