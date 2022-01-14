@@ -2,9 +2,21 @@ from SimpleITK import Image
 
 
 class Pipeline(object):
-    """
-    Defines a set of operations to be applied on an image.
-    Operations can be either transforms or reads.
+    """Defines an executable, sequential set of operations.
+    Operations can be Transform or Read object.
+
+    :Example:
+
+    >>> pipl = Pipeline(ReadVolume(), Resample(2), ToNumpyArray())
+    >>> im_arr = pipl('path/to/image.nrrd')
+
+    :param steps: operations that define the pipeline
+    :type steps: Transform and/or Read
+    ...
+    :raises Warning: if the input/output of each operation is not as expected.
+    ...
+    :return: transformed input
+    :rtype: rtype of the last operation in the pipeline
     """
     def __init__(self, *steps):
         self.steps = steps
@@ -34,23 +46,17 @@ class Pipeline(object):
 
 
 class Read(object):
+    """"Abstract interface, defines a read operation.
+    Read operation usually have filepath on input and return a SimpleITK.Image object.
     """
-    Defines the operation to read an image from disk.
-    """
-    def __init__(self):
-        pass
-
     def __call__(self, filename):
-        pass
+        return Image()
 
 
 class Transform(object):
+    """"Abstract interface, defines a transform operation.
+    Read operation usually have SimpleITK.Image objects on both input and output.
     """
-    Defines the operation to be applied on an image.
-    """
-    def __init__(self):
-        pass
-
     def __call__(self, image):
         return image
 

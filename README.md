@@ -12,7 +12,6 @@ Frida requires
 * NumPy (>=1.19) 
 * SciPy (>=1.5.2)
 * SimpleITK (>=2.0)
-* SciKit-Learn (>=0.24.2)
 * SciKit-Image (>=0.17.2)
 
 Older packages might still work, but not guaranteed. 

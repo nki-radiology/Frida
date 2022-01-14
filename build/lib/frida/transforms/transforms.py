@@ -8,7 +8,19 @@ from ..base import Transform
 
 
 class ITKFilter(Transform):
+    """Wraps a SimpleITK filter into a transform operation.
+    The Execute method has to be exposed.
 
+    :Example:
+
+    >>> flt = SimpleITK.DiscreteGaussianImageFilter()
+    >>> flt.SetVariance(0.65)
+    >>> blurring = ITKFilter(flt)
+    >>> pipl = Pipeline(ReadVolume(), blurring, ToNumpyArray())
+
+    :param itk_filter: filter to apply
+    :type itk_filter: object of type SimpleITK.ImageFilter
+    """
     def __init__(self, itk_filter):
         self.flt = itk_filter
         super(ITKFilter, self).__init__()
@@ -18,7 +30,20 @@ class ITKFilter(Transform):
 
 
 class NumpyFunction(Transform):
+    """Wraps a function that operates on numpy array into a transform operation.
+    The function can have only one input, corresponding to the numpy array.
 
+    :Example:
+
+    >>> def my_numpy_log_filter(image_array):
+    >>>     non_neg_arr = np.clip(image_array, 1e-9, image_array.max())
+    >>>     return np.log(non_neg_arr)
+    >>> log_filter = NumpyFunction(my_numpy_log_filter)
+    >>> pipl = Pipeline(ReadVolume(), log_filter, ToNumpyArray())
+
+    :param np_function: function that operates on a numpy array
+    :type np_function: python function
+    """
     def __init__(self, np_function):
         self.flt = np_function
         super(NumpyFunction, self).__init__()
@@ -35,7 +60,16 @@ class NumpyFunction(Transform):
 
 
 class ZeroOneScaling(Transform):
+    """Scales intensities between 0 and 1
 
+    :Example:
+
+    >>> ppl = Pipeline(ReadVolume(), ZeroOneScaling(), ToNumpyArray())
+    >>> arr = ppl('path/to/image')
+    >>> print('max: ' + str(arr.max()) + ' min: ' + str(arr.min()))
+    >>> max: 1.0 min: 0.0
+
+    """
     def __init__(self):
         self.minmax_flt = sitk.MinimumMaximumImageFilter()
         self.cast_flt = sitk.CastImageFilter()
@@ -53,7 +87,27 @@ class ZeroOneScaling(Transform):
 
 
 class PadAndCropTo(Transform):
+    """Sets the image to a specific size by pad and crop operations.
+    Both pad and crop are applied from the center.
+    Pad is applied first.
 
+    :Example:
+
+    >>> # without PadAndCropTo
+    >>> my_pipeline = Pipeline(ReadVoume(), ToNumpyArray())
+    >>> my_pipeline('my_image.nrrd').shape
+    >>> (52, 79, 89)
+    >>> # with PadAndCropTo
+    >>> my_pipeline = Pipeline(ReadVoume(), PadAndCropTo((64, None, 64)), ToNumpyArray())
+    >>> my_pipeline('my_image.nrrd').shape
+    >>> (64, 79, 64)
+
+    :param target_shape: output size
+    :type target_shape: tuple of ints.
+        If entry is None, the shape along that dim is left untouched.
+    :param cval: filling value for the padding operation, default to 0.
+    :type cval: int or float
+    """
     def __init__(self, target_shape, cval=0.):
         self.target_shape = target_shape
         self.cval = cval
@@ -80,11 +134,22 @@ class PadAndCropTo(Transform):
 
 
 class Resample(Transform):
+    """Resamples the image to a specified voxel size.
 
-    def __init__(self, spacing=1., orient=True, interpolator=sitk.sitkLinear):
+    :Example:
+    >>> # with PadAndCropTo
+    >>> my_pipeline = Pipeline(ReadVoume(), Resample(2.), ToNumpyArray())
+
+    :param spacing: output spacing
+    :type spacing: int, tuple of ints or Nones.
+        If entry is None, the shape along that dim is left untouched.
+    :param interpolator: interpolator function
+    :type
+
+    """
+    def __init__(self, spacing=1., interpolator=sitk.sitkLinear):
         self.spacing = spacing
         self.interpolator = interpolator
-        self.orient = orient
         self.flt = sitk.ResampleImageFilter()
         super(Resample, self).__init__()
 
@@ -103,7 +168,9 @@ class Resample(Transform):
 
 
 class ResampleAndOrient(Transform):
-
+    """Same as the Resample transform, but with the options to correct for different orientations.
+    This is frequently used for MRIs, where acquisition planes can be often not along the axial plane.
+    """
     def __init__(self, spacing=1., interpolator=sitk.sitkLinear):
         self.spacing = spacing
         self.interpolator = interpolator
@@ -160,15 +227,20 @@ class ResampleAndOrient(Transform):
 
 
 class RunningDatasetStandardization(Transform):
-    """" RunningDatasetStandardization
-    Uses the Welford's method to compute running mean and running variance (stored internally).
+    """Uses the Welford's method to compute running mean and running variance (stored internally).
     Single image standardization is performed via classic (x - mu)/sigma.
 
-    Params
-    ------
-        * max_iters: maximum iterations up until which the internal stats have to been updated
-    """
+    :Example:
+    >>> stats = RunningDatasetStandardization()
+    >>> ppl = Pipeline(ReadVolume(), stats, ToNumpyArray())
+    >>> for ct_path in ct_dataset:
+    >>>     ppl(ct_path)
+    >>> print(stats.var)
+    >>> 378.34 # variance of the CT scans estimated over the dataset
 
+    :param max_iters: number maximum iterations, default to 1000
+    :type max_iters: int
+    """
     def __init__(self, max_iters=1000):
         self.n = -1.
         self.max_iters = max_iters
@@ -206,7 +278,16 @@ class RunningDatasetStandardization(Transform):
 
 
 class RunningDatasetStandardizationListener(Transform):
+    """Related to the RunningDatasetStandarization transform.
+    This is useful for the validation set, where you don't want to collect statistics, but just run the standardization
+    according to the ones you have collected so far.
 
+    :Example
+    >>> stats = RunningDatasetStandardization(max_iters=1000)
+    >>> pipeline_train = Pipeline(ReadVolume(), stats, ToNumpyArray())
+    >>> stats_list = RunningDatasetStandardizationListener(stats)
+    >>> pipeline_valid = Pipeline(ReadVolume(), stats_list, ToNumpyArray())
+    """
     def __init__(self, running_stats):
         self.running_stats = running_stats
         super(RunningDatasetStandardizationListener, self).__init__()
