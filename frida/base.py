@@ -1,5 +1,6 @@
 from SimpleITK import Image
 
+#TODO rewrite the pipelines/transform to have them compatible with scikit learn
 
 class Pipeline(object):
     """Defines an executable, sequential set of operations.
