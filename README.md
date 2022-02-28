@@ -55,8 +55,8 @@ from frida import Pipeline
 from frida.readers ReadDICOM
 from frida.transforms import PadAndCropTo
 
-from frida.transforms.aumentations import RandomLinearDisplacement
-from frida.transforms.cast import ToNumpyArray
+from frida.aumentations import RandomLinearDisplacement
+from frida.cast import ToNumpyArray
 
 my_pipeline = Pipeline(
     ReadDICOM(),
