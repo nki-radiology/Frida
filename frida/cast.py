@@ -1,6 +1,14 @@
 import SimpleITK as sitk
-from .base import Cast
+from .base import Transform
 
+class Cast(Transform):
+
+    def __init__(self):
+        self.random_seed = 0
+        super(Cast, self).__init__()
+
+    def __call__(self, image, *args):
+        pass
 
 class ToNumpyArray(Cast):
     """Cast the SimpleITK.Image to a numpy ndarray.

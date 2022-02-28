@@ -44,7 +44,6 @@ class Pipeline(object):
 
 # !- Interface for base classes, defining atomic operations
 
-
 class Read(object):
     """"Abstract interface, defines a read operation.
     Read operation usually have filepath on input and return a SimpleITK.Image object.

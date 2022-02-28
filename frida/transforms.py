@@ -1,7 +1,7 @@
 import SimpleITK as sitk
 from numpy import floor, ceil
 
-from ..base import Transform
+from frida.base import Transform
 
 
 # !- Base transforms, functioning as wrappers for ITK or Numpy functions

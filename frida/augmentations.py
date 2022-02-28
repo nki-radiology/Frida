@@ -1,13 +1,24 @@
-from .base import Augmentation
-
 import SimpleITK as sitk
 import numpy as np
 
+from .base import Transform
 from numpy.random import uniform
 from scipy.ndimage.filters import gaussian_filter
 
 
 # !- Interface for augmentation classes
+
+class Augmentation(Transform):
+
+    def __init__(self):
+        self.random_seed = 0
+        super(Augmentation, self).__init__()
+
+    def __call__(self, image, *args):
+        return image
+
+    def get_random_params(self, image):
+        return None
 
 
 class ApplyTransformAtRandom(Augmentation):
