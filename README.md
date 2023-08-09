@@ -5,6 +5,14 @@ Frida results as a collection of different functions and procedures for medical 
 
 ### Getting Started
 
+Dont install with pip, but rather:
+```
+git clone https://github.com/nki-radiology/Frida
+cd Frida
+pip install -e .
+```
+
+
 #### Dependencies
 
 Frida requires 
@@ -15,6 +23,7 @@ Frida requires
 * SciKit-Image (>=0.17.2)
 
 Older packages might still work, but not guaranteed. 
+
 
 ### Usage
 
@@ -52,10 +61,10 @@ Here is an example of a pipeline using them
 
 ```
 from frida import Pipeline
-from frida.readers ReadDICOM
+from frida.readers import ReadDICOM
 from frida.transforms import PadAndCropTo
 
-from frida.aumentations import RandomLinearDisplacement
+from frida.augmentations import RandomLinearDisplacement
 from frida.cast import ToNumpyArray
 
 my_pipeline = Pipeline(
