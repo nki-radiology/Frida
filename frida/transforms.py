@@ -85,6 +85,45 @@ class ZeroOneScaling(Transform):
         return image
 
 
+class PadTo(Transform):
+    """Sets the image to a specific size by pad operations.
+    Both pad and crop are applied from the center.
+    Pad is applied first.
+
+    :Example:
+
+    >>> # without PadAndCropTo
+    >>> my_pipeline = Pipeline(ReadVoume(), ToNumpyArray())
+    >>> my_pipeline('my_image.nrrd').shape
+    >>> (52, 79, 89)
+    >>> # with PadAndCropTo
+    >>> my_pipeline = Pipeline(ReadVoume(), PadAndCropTo((64, None, 64)), ToNumpyArray())
+    >>> my_pipeline('my_image.nrrd').shape
+    >>> (64, 79, 64)
+
+    :param target_shape: output size
+    :type target_shape: tuple of ints.
+        If entry is None, the shape along that dim is left untouched.
+    :param cval: filling value for the padding operation, default to 0.
+    :type cval: int or float
+    """
+    def __init__(self, target_shape, cval=0.):
+        self.target_shape = target_shape
+        self.cval = cval
+        super(PadAndCropTo, self).__init__()
+
+    def __call__(self, image):
+        # padding
+        shape = image.GetSize()
+        target_shape = [s if t is None else t for s, t in zip(shape, self.target_shape)]
+        pad = [max(s - t, 0) for t, s in zip(shape, target_shape)]
+        lo_bound = [int(floor(p / 2)) for p in pad]
+        up_bound = [int(ceil(p / 2)) for p in pad]
+        image = sitk.ConstantPad(image, lo_bound, up_bound, self.cval)
+
+        return image
+
+
 class PadAndCropTo(Transform):
     """Sets the image to a specific size by pad and crop operations.
     Both pad and crop are applied from the center.
